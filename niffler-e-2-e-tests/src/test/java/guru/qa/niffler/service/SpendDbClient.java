@@ -18,26 +18,15 @@ public class SpendDbClient {
     private final SpendDAO spendDao = new SpendDAOJdbc();
     private final CategoryDAO categoryDao = new CategoryDAOJdbc();
 
-    public SpendJson addSpend(SpendJson spend) {
+    public SpendJson createSpend(SpendJson spend) {
         CategoryEntity categoryEntity;
         SpendEntity spendEntity = SpendEntity.fromJson(spend);
         if (spendEntity.getCategory().getId() == null) {
-            // ищем категорию т.к у пользователя не может быть 2 категории с одним названием
             Optional<CategoryEntity> optionalCategoryEntity = categoryDao.findCategoryByUsernameAndCategoryName(spendEntity.getUsername(), spendEntity.getCategory().getName());
-            //если нашли категорию вернем ее если нет создадим новую
             categoryEntity = optionalCategoryEntity.orElseGet(() -> categoryDao.createCategory(spendEntity.getCategory()));
             spendEntity.setCategory(categoryEntity);
         }
         return SpendJson.fromEntity(spendDao.createSpend(spendEntity));
-    }
-    public SpendJson createSpend(SpendJson spend) {
-        SpendEntity spendEntity = SpendEntity.fromJson(spend);
-        if (spendEntity.getCategory().getId() == null) {
-            CategoryEntity categoryEntity = categoryDao.createCategory(spendEntity.getCategory());
-            spendEntity.setCategory(categoryEntity);
-        }
-        return
-                SpendJson.fromEntity(spendDao.createSpend(spendEntity));
     }
 
     public CategoryJson addCategory(CategoryJson category) {
