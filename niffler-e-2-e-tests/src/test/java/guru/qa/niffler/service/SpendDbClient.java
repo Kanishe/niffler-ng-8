@@ -39,7 +39,8 @@ public class SpendDbClient {
         return CategoryJson.fromEntity(categoryDao.update(categoryEntity));
     }
 
-    public Optional<SpendEntity> find(UUID id) {
+    public Optional<SpendEntity> findById(UUID id) {
+
         return spendDao.findSpendById(id);
     }
 
