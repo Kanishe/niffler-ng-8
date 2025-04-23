@@ -31,6 +31,29 @@ public class DataBases {
     public record XaConsumer(Consumer<Connection> function, String jdbcUrl) {
     }
 
+    public static <T> T transaction(Function<Connection, T> function, String jdbcUrl) {
+        Connection connection = null;
+
+        try {
+            connection = DataBases.getConnection(jdbcUrl);
+            connection.setAutoCommit(false);
+            T result = function.apply(connection);
+            connection.commit();
+            connection.setAutoCommit(true);
+            return result;
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    connection.setAutoCommit(true);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> T xaTransaction(XaFunction<T>... actions) {
         UserTransaction userTransaction = new UserTransactionImp();
         try {
@@ -49,6 +72,29 @@ public class DataBases {
             } catch (SystemException ex) {
                 throw new RuntimeException(ex);
 
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    public static void transaction(Consumer<Connection> consumer, String jdbcUrl) {
+        Connection connection = null;
+
+        try {
+            connection = DataBases.getConnection(jdbcUrl);
+            connection.setAutoCommit(false);
+            consumer.accept(connection);
+            connection.commit();
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    connection.setAutoCommit(true);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
             throw new RuntimeException(e);
         }
