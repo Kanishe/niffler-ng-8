@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.UUID;
 
 public class AuthAuthorityDAOJdbc implements AuthAuthorityDAO {
+
     private final Connection connection;
 
     public AuthAuthorityDAOJdbc(Connection connection) {

@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class AuthUserDAOJdbc implements AuthUserDao {
+
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
     private final Connection connection;

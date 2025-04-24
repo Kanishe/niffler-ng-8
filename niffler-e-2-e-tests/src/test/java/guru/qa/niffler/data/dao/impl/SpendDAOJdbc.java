@@ -1,6 +1,5 @@
 package guru.qa.niffler.data.dao.impl;
 
-import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.SpendDAO;
 import guru.qa.niffler.data.entity.category.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
@@ -13,8 +12,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class SpendDAOJdbc implements SpendDAO {
-
-    private static final Config CONFIG = Config.getInstance();
 
     private final Connection connection;
 

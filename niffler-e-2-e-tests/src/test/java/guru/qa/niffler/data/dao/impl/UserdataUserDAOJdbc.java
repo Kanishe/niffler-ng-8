@@ -1,6 +1,5 @@
 package guru.qa.niffler.data.dao.impl;
 
-import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.UserDAO;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
@@ -10,8 +9,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class UserdataUserDAOJdbc implements UserDAO {
-
-    private static final Config CONFIG = Config.getInstance();
 
     private final Connection connection;
 
