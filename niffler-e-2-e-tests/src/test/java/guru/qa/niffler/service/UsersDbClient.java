@@ -44,13 +44,12 @@ public class UsersDbClient {
         ).toArray(AuthorityEntity[]::new);
 
         new AuthAuthorityDAOSpringJdbc(dataSource(CFG.authJdbcUrl()))
-                .create(authorityEntities);
+                .createUser(authorityEntities);
 
         return UserJson.fromEntity(
                 new UserdataUserDAOSpringJdbc(dataSource(CFG.userdataJdbcUrl()))
                         .createUser(UserEntity.fromJson(user)
                         )
-                ,null
         );
     }
 
@@ -68,7 +67,7 @@ public class UsersDbClient {
                                     authUser.setAccountNonLocked(true);
                                     authUser.setCredentialsNonExpired(true);
                                     new AuthUserDAOJdbc(con).createUser(authUser);
-                                    new AuthAuthorityDAOJdbc(con).create(
+                                    new AuthAuthorityDAOJdbc(con).createUser(
                                             Arrays.stream(Authority.values())
                                                     .map(a -> {
                                                                 AuthorityEntity ae = new AuthorityEntity();
@@ -92,8 +91,7 @@ public class UsersDbClient {
                                 },
                                 CFG.userdataJdbcUrl()
                         )
-                ),
-                null);
+                ));
     }
 
 }
