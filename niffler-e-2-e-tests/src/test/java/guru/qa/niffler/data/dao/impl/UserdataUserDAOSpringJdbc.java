@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,5 +68,14 @@ public class UserdataUserDAOSpringJdbc implements UserDAO {
     @Override
     public void delete(UserEntity user) {
 
+    }
+
+    @Override
+    public List<UserEntity> findAll() {
+            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+            return jdbcTemplate.query(
+                    "SELECT * FROM \"user\"",
+                    UserdataUserEntityRowMapper.instance
+            );
     }
 }

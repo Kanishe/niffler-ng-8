@@ -2,12 +2,15 @@ package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.impl.CategoryDAOJdbc;
+import guru.qa.niffler.data.dao.impl.CategoryDAOSpringJdbc;
 import guru.qa.niffler.data.dao.impl.SpendDAOJdbc;
+import guru.qa.niffler.data.dao.impl.SpendDAOSpringJdbc;
 import guru.qa.niffler.data.entity.category.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 
+import static guru.qa.niffler.data.DataBases.dataSource;
 import static guru.qa.niffler.data.DataBases.transaction;
 import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
@@ -35,5 +38,18 @@ public class SpendDbClient {
             return CategoryJson.fromEntity(
                     new CategoryDAOJdbc(connection).create(categoryEntity));
         }, CFG.spendJdbcUrl(), TRANSACTION_READ_COMMITTED);
+    }
+
+    public SpendJson createSpendSpringJdbc(SpendJson spend) {
+        SpendEntity spendEntity = SpendEntity.fromJson(spend);
+        if (spendEntity.getCategory().getId() == null) {
+            CategoryEntity categoryEntity = new CategoryDAOSpringJdbc(dataSource(CFG.spendJdbcUrl()))
+                    .create(spendEntity.getCategory());
+            spendEntity.setCategory(categoryEntity);
+        }
+        return SpendJson.fromEntity(
+                new SpendDAOSpringJdbc(dataSource(CFG.spendJdbcUrl()))
+                        .createSpend(spendEntity)
+        );
     }
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.UUID;
 
 @Getter
@@ -18,7 +19,7 @@ public class SpendEntity implements Serializable {
     private UUID id;
     private String username;
     private CurrencyValues currency;
-    private java.util.Date spendDate;
+    private Date spendDate;
     private Double amount;
     private String description;
     private CategoryEntity category;
