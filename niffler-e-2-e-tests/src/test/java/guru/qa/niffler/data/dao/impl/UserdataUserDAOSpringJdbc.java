@@ -26,7 +26,7 @@ public class UserdataUserDAOSpringJdbc implements UserDAO {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
                     PreparedStatement ps = con.prepareStatement(
-                            "INSERT INTO \"user\" (username, currency,firstname,surname,full_name,photo,photoSmall) VALUES (?, ?,?,?, ?,?,?)",
+                            "INSERT INTO \"user\" (username, currency,firstname,surname,full_name,photo,photo_small) VALUES (?, ?,?,?, ?,?,?)",
                             PreparedStatement.RETURN_GENERATED_KEYS);
                     ps.setString(1, user.getUsername());
                     ps.setObject(2, user.getCurrency().name());

@@ -3,8 +3,9 @@ package guru.qa.niffler.data.dao.impl;
 import guru.qa.niffler.data.dao.AuthAuthorityDAO;
 import guru.qa.niffler.data.entity.userAuth.AuthorityEntity;
 
-import java.sql.*;
-import java.util.UUID;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class AuthAuthorityDAOJdbc implements AuthAuthorityDAO {
 
@@ -15,25 +16,17 @@ public class AuthAuthorityDAOJdbc implements AuthAuthorityDAO {
     }
 
     @Override
-    public AuthorityEntity create(AuthorityEntity user) {
+    public void create(AuthorityEntity... authority) {
         try (PreparedStatement ps = connection.prepareStatement(
-                "INSERT INTO \"authority\" (user_id, authority) " +
-                        "VALUES (?, ? )",
-                Statement.RETURN_GENERATED_KEYS
-        )) {
-            ps.setObject(1, user.getUserId());
-            ps.setString(2, user.getAuthority().name());
-            ps.executeUpdate();
-            final UUID generatedKey;
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    generatedKey = rs.getObject("id", UUID.class);
-                } else {
-                    throw new SQLException("Cant find id in ResultSet");
-                }
+                "INSERT INTO \"authority\" (user_id, authority) VALUES (?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+            for (AuthorityEntity a : authority) {
+                ps.setObject(1, a.getUserId());
+                ps.setString(2, a.getAuthority().name());
+                ps.addBatch();
+                ps.clearParameters();
             }
-            user.setId(generatedKey);
-            return user;
+            ps.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
