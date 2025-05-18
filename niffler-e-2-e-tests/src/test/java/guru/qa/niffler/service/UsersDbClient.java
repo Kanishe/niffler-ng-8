@@ -50,6 +50,7 @@ public class UsersDbClient {
                 new UserdataUserDAOSpringJdbc(dataSource(CFG.userdataJdbcUrl()))
                         .createUser(UserEntity.fromJson(user)
                         )
+                , null
         );
     }
 
@@ -91,7 +92,8 @@ public class UsersDbClient {
                                 },
                                 CFG.userdataJdbcUrl()
                         )
-                ));
+                ),
+                null);
     }
 
 }

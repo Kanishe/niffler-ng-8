@@ -43,7 +43,8 @@ public class AuthUserDbClient {
         new AuthAuthorityDAOSpringJdbc(dataSource(CFG.authJdbcUrl())).createUser(userAuthorities);
         return UserJson.fromEntity(new UserdataUserDAOSpringJdbc(dataSource(CFG.userdataJdbcUrl())).createUser(
                 UserEntity.fromJson(user)
-        ));
+
+        ), null);
     }
 
 }

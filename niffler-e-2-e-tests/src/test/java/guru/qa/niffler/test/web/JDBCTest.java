@@ -49,6 +49,7 @@ public class JDBCTest {
                         null,
                         CurrencyValues.RUB,
                         null,
+                        null,
                         null
                 )
         );
