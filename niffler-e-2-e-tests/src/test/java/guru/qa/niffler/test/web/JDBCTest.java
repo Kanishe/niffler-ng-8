@@ -3,6 +3,8 @@ package guru.qa.niffler.test.web;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
+import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.service.AuthUserDbClient;
 import guru.qa.niffler.service.SpendDbClient;
 import org.junit.jupiter.api.Test;
 
@@ -33,5 +35,46 @@ public class JDBCTest {
                 )
         );
         System.err.println(spend);
+    }
+
+    @Test
+    void authSpringJdbcTest() {
+        AuthUserDbClient authUserDbClient = new AuthUserDbClient();
+        UserJson user = authUserDbClient.createUserSpringJdbc(
+                new UserJson(
+                        null,
+                        genRandomName(),
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
+    void createSpendJdbcTest() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        SpendJson spendJson = spendDbClient.createSpendSpringJdbc(
+                new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
+                                null,
+                                genRandomName(),
+                                genRandomCommerceName(),
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        1111.00,
+                        genRandomName(),
+                        genRandomName()
+                )
+        );
+        System.out.println(spendJson);
     }
 }

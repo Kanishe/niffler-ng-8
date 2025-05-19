@@ -1,15 +1,17 @@
 package guru.qa.niffler.data.dao.impl;
 
-import guru.qa.niffler.data.dao.AuthUserDao;
+import guru.qa.niffler.data.dao.AuthUserDAO;
 import guru.qa.niffler.data.entity.userAuth.AuthUserEntity;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class AuthUserDAOJdbc implements AuthUserDao {
+public class AuthUserDAOJdbc implements AuthUserDAO {
 
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
@@ -100,6 +102,33 @@ public class AuthUserDAOJdbc implements AuthUserDao {
                 } else {
                     return Optional.empty();
                 }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<AuthUserEntity> findAll() {
+        try (PreparedStatement ps = connection.prepareStatement
+                ("SELECT * FROM \"user\"")) {
+            ps.execute();
+            List<AuthUserEntity> result = new ArrayList<>();
+            try (ResultSet rs = ps.getResultSet()) {
+                while (rs.next()) {
+                    AuthUserEntity ue = new AuthUserEntity();
+
+                    ue.setId(rs.getObject("id", UUID.class));
+                    ue.setUsername(rs.getString("username"));
+                    ue.setPassword(rs.getString("password"));
+                    ue.setEnabled((rs.getBoolean("enabled")));
+                    ue.setAccountNonExpired((rs.getBoolean("account_non_expired")));
+                    ue.setAccountNonLocked((rs.getBoolean("account_non_locked")));
+                    ue.setCredentialsNonExpired((rs.getBoolean("credentials_non_expired")));
+                    result.add(ue);
+
+                }
+                return result;
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

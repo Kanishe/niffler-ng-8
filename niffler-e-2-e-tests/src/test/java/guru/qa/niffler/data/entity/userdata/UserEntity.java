@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Getter
@@ -32,8 +33,8 @@ public class UserEntity implements Serializable {
         userEntity.setFirstname(json.firstname());
         userEntity.setSurname(json.surname());
         userEntity.setFullname(json.fullname());
-        userEntity.setPhoto(json.photo().getBytes());
-        userEntity.setPhotoSmall(json.photoSmall().getBytes());
+        userEntity.setPhoto(json.photo() != null ? json.photo().getBytes(StandardCharsets.UTF_8) : null);
+        userEntity.setPhotoSmall(json.photoSmall() != null ? json.photoSmall().getBytes(StandardCharsets.UTF_8) : null);
         return userEntity;
     }
 }
