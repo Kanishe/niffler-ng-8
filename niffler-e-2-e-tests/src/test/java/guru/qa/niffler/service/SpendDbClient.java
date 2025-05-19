@@ -10,7 +10,6 @@ import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.SpendJson;
 
-import static guru.qa.niffler.data.DataBases.dataSource;
 import static guru.qa.niffler.data.DataBases.transaction;
 import static java.sql.Connection.TRANSACTION_READ_COMMITTED;
 
@@ -22,12 +21,12 @@ public class SpendDbClient {
         return transaction(connection -> {
             SpendEntity spendEntity = SpendEntity.fromJson(spend);
             if (spendEntity.getCategory().getId() == null) {
-                CategoryEntity categoryEntity = new CategoryDAOJdbc(connection)
+                CategoryEntity categoryEntity = new CategoryDAOJdbc()
                         .create(spendEntity.getCategory());
                 spendEntity.setCategory(categoryEntity);
             }
             return SpendJson.fromEntity(
-                    new SpendDAOJdbc(connection).createSpend(spendEntity)
+                    new SpendDAOJdbc().createSpend(spendEntity)
             );
         }, CFG.spendJdbcUrl(), TRANSACTION_READ_COMMITTED);
     }
@@ -36,19 +35,19 @@ public class SpendDbClient {
         return transaction(connection -> {
             CategoryEntity categoryEntity = CategoryEntity.fromJson(category);
             return CategoryJson.fromEntity(
-                    new CategoryDAOJdbc(connection).create(categoryEntity));
+                    new CategoryDAOJdbc().create(categoryEntity));
         }, CFG.spendJdbcUrl(), TRANSACTION_READ_COMMITTED);
     }
 
     public SpendJson createSpendSpringJdbc(SpendJson spend) {
         SpendEntity spendEntity = SpendEntity.fromJson(spend);
         if (spendEntity.getCategory().getId() == null) {
-            CategoryEntity categoryEntity = new CategoryDAOSpringJdbc(dataSource(CFG.spendJdbcUrl()))
+            CategoryEntity categoryEntity = new CategoryDAOSpringJdbc()
                     .create(spendEntity.getCategory());
             spendEntity.setCategory(categoryEntity);
         }
         return SpendJson.fromEntity(
-                new SpendDAOSpringJdbc(dataSource(CFG.spendJdbcUrl()))
+                new SpendDAOSpringJdbc()
                         .createSpend(spendEntity)
         );
     }

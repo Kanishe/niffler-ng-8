@@ -14,8 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
 
-import static guru.qa.niffler.data.DataBases.dataSource;
-
 public class AuthUserDbClient {
 
     private static final Config CFG = Config.getInstance();
@@ -30,7 +28,7 @@ public class AuthUserDbClient {
         authUserEntity.setAccountNonLocked(true);
         authUserEntity.setCredentialsNonExpired(true);
 
-        AuthUserEntity createdAuthUser = new AuthUserDAOSpringJdbc(dataSource(CFG.authJdbcUrl())).createUser(authUserEntity);
+        AuthUserEntity createdAuthUser = new AuthUserDAOSpringJdbc().createUser(authUserEntity);
         AuthorityEntity[] userAuthorities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
@@ -40,10 +38,9 @@ public class AuthUserDbClient {
                 }).toArray(AuthorityEntity[]::new);
 
 
-        new AuthAuthorityDAOSpringJdbc(dataSource(CFG.authJdbcUrl())).createUser(userAuthorities);
-        return UserJson.fromEntity(new UserdataUserDAOSpringJdbc(dataSource(CFG.userdataJdbcUrl())).createUser(
+        new AuthAuthorityDAOSpringJdbc().createUser(userAuthorities);
+        return UserJson.fromEntity(new UserdataUserDAOSpringJdbc().createUser(
                 UserEntity.fromJson(user)
-
         ), null);
     }
 

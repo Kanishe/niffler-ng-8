@@ -6,10 +6,12 @@ import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
 import guru.qa.niffler.service.AuthUserDbClient;
 import guru.qa.niffler.service.SpendDbClient;
+import guru.qa.niffler.service.UsersDbClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.FakerGenUtil.*;
 
 public class JDBCTest {
@@ -76,5 +78,119 @@ public class JDBCTest {
                 )
         );
         System.out.println(spendJson);
+    }
+
+    @Test
+    void createUserSpringWithOutTx() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+
+        UserJson user = new UserJson(
+                null,
+                genRandomName(),
+                null,
+                null,
+                null,
+                CurrencyValues.RUB,
+                null,
+                null,
+                null
+        );
+        UserJson createdUser = usersDbClient.createUserSpringWithOutTransactions(user);
+        System.out.println(createdUser);
+
+        assertTrue(usersDbClient.isUserCreatedInUd(createdUser.id()));
+        assertTrue(usersDbClient.isUserCreatedInUserAuth(createdUser.username()));
+        assertTrue(usersDbClient.isAllAuthoritiesCreated(createdUser.username()));
+    }
+
+
+    @Test
+    void createUserWithSpringChainedTxManager() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+
+        UserJson user = new UserJson(
+                null,
+                genRandomName(),
+                null,
+                null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null,
+                null
+        );
+        UserJson createdUser = usersDbClient.createUserChainedTxManager(user);
+        System.out.println(createdUser);
+
+        assertTrue(usersDbClient.isUserCreatedInUd(createdUser.id()));
+        assertTrue(usersDbClient.isUserCreatedInUserAuth(createdUser.username()));
+        assertTrue(usersDbClient.isAllAuthoritiesCreated(createdUser.username()));
+    }
+
+    @Test
+    void shouldRollBackCreateUserWithSpringChainedTxManager() {
+
+        UsersDbClient usersDbClient = new UsersDbClient();
+
+        UserJson user = new UserJson(
+                null,
+                genRandomName(),
+                null,
+                null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null,
+                null
+        );
+
+        System.out.println(user);
+        usersDbClient.createUserChainedTxManager(user);
+    }
+
+    @Test
+    void createUserJdbcWithTx() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+
+        UserJson user = new UserJson(
+                null,
+                genRandomName(),
+                null,
+                null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null,
+                null
+        );
+        UserJson createdUser = usersDbClient.createUserJdbcWithXaTransactions(user);
+        System.out.println(createdUser);
+
+        assertTrue(usersDbClient.isUserCreatedInUd(createdUser.id()));
+        assertTrue(usersDbClient.isUserCreatedInUserAuth(createdUser.username()));
+        assertTrue(usersDbClient.isAllAuthoritiesCreated(createdUser.username()));
+    }
+
+    @Test
+    void createUserJdbcWithOutTx() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+
+        UserJson user = new UserJson(
+                null,
+               genRandomName(),
+                null,
+                null,
+                null,
+                CurrencyValues.EUR,
+                null,
+                null,
+                null
+        );
+        UserJson createdUser = usersDbClient.createUserJdbcWithOutTransactions(user);
+        System.out.println(createdUser);
+
+        assertTrue(usersDbClient.isUserCreatedInUd(createdUser.id()));
+        assertTrue(usersDbClient.isUserCreatedInUserAuth(createdUser.username()));
+        assertTrue(usersDbClient.isAllAuthoritiesCreated(createdUser.username()));
     }
 }
