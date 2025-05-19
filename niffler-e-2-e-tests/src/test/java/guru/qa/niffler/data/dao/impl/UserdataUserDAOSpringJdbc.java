@@ -5,6 +5,7 @@ import guru.qa.niffler.data.dao.UserDAO;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.mapper.UserdataUserEntityRowMapper;
 import guru.qa.niffler.data.tpl.DataSources;
+import guru.qa.niffler.exceptions.ShouldResolveException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -54,17 +55,17 @@ public class UserdataUserDAOSpringJdbc implements UserDAO {
 
     @Override
     public Optional<UserEntity> findByUsername(String username) {
-        return Optional.empty();
+        throw new ShouldResolveException("should resolve method");
     }
 
     @Override
     public UserEntity update(UserEntity user) {
-        return null;
+        throw new ShouldResolveException("should resolve method");
     }
 
     @Override
     public void delete(UserEntity user) {
-
+        throw new ShouldResolveException("should resolve method");
     }
 
     @Override
