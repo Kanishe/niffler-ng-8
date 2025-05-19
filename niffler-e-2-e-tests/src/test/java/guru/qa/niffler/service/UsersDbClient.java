@@ -11,6 +11,7 @@ import guru.qa.niffler.model.UserJson;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 
 import static guru.qa.niffler.data.DataBases.dataSource;
@@ -19,7 +20,13 @@ import static guru.qa.niffler.data.DataBases.xaTransaction;
 public class UsersDbClient {
 
     private static final Config CFG = Config.getInstance();
+    private final DataSource authDataSource = dataSource(CFG.authJdbcUrl());
+    private final DataSource userDataDataSource = dataSource(CFG.userdataJdbcUrl());
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+    private final AuthUserDAOSpringJdbc authUserDAO = new AuthUserDAOSpringJdbc(authDataSource);
+    private final AuthAuthorityDAOSpringJdbc authAuthorityDAO = new AuthAuthorityDAOSpringJdbc(authDataSource);
+    private final UserdataUserDAOSpringJdbc userdataUserDAO = new UserdataUserDAOSpringJdbc(userDataDataSource);
 
 
     public UserJson createUserSpringJdbc(UserJson user) {
@@ -31,7 +38,7 @@ public class UsersDbClient {
         authUser.setAccountNonLocked(true);
         authUser.setCredentialsNonExpired(true);
 
-        AuthUserEntity createdAuthUser = new AuthUserDAOSpringJdbc(dataSource(CFG.authJdbcUrl()))
+        AuthUserEntity createdAuthUser = authUserDAO
                 .createUser(authUser);
 
         AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
@@ -43,11 +50,11 @@ public class UsersDbClient {
                 }
         ).toArray(AuthorityEntity[]::new);
 
-        new AuthAuthorityDAOSpringJdbc(dataSource(CFG.authJdbcUrl()))
+        authAuthorityDAO
                 .createUser(authorityEntities);
 
         return UserJson.fromEntity(
-                new UserdataUserDAOSpringJdbc(dataSource(CFG.userdataJdbcUrl()))
+                userdataUserDAO
                         .createUser(UserEntity.fromJson(user)
                         )
                 , null

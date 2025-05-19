@@ -3,6 +3,7 @@ package guru.qa.niffler.data.dao.impl;
 import guru.qa.niffler.data.dao.AuthUserDAO;
 import guru.qa.niffler.data.entity.userAuth.AuthUserEntity;
 import guru.qa.niffler.data.mapper.AuthUserEntityRowMapper;
+import guru.qa.niffler.exceptions.ShouldResolveException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -56,7 +57,7 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO {
 
     @Override
     public Optional<AuthUserEntity> findByUsername(String username) {
-        return Optional.empty();
+        throw new ShouldResolveException("should resolve method");
     }
 
     @Override
