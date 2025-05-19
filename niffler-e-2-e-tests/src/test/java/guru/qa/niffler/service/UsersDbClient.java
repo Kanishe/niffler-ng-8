@@ -1,8 +1,12 @@
 package guru.qa.niffler.service;
 
 import guru.qa.niffler.config.Config;
-import guru.qa.niffler.data.DataBases;
-import guru.qa.niffler.data.dao.impl.*;
+import guru.qa.niffler.data.dao.AuthAuthorityDAO;
+import guru.qa.niffler.data.dao.AuthUserDAO;
+import guru.qa.niffler.data.dao.UserDAO;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDAOSpringJdbc;
+import guru.qa.niffler.data.dao.impl.AuthUserDAOSpringJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDAOSpringJdbc;
 import guru.qa.niffler.data.entity.userAuth.AuthUserEntity;
 import guru.qa.niffler.data.entity.userAuth.Authority;
 import guru.qa.niffler.data.entity.userAuth.AuthorityEntity;
@@ -27,10 +31,6 @@ public class UsersDbClient {
 
     private static final Config CFG = Config.getInstance();
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
-    private final AuthUserDAO authUserDao = new AuthUserDAOSpringJdbc();
-    private final AuthAuthorityDAO authAuthorityDao = new AuthAuthorityDAOSpringJdbc();
-    private final UserDAO udUserDao = new UserdataUserDAOSpringJdbc();
 
 
     private final AuthUserDAO authUserSpringDao = new AuthUserDAOSpringJdbc();
@@ -59,7 +59,7 @@ public class UsersDbClient {
                     authUser.setAccountNonLocked(true);
                     authUser.setCredentialsNonExpired(true);
 
-                    AuthUserEntity createdAuthUser = authUserDao.createUser(authUser);
+                    AuthUserEntity createdAuthUser = authUserSpringDao.createUser(authUser);
 
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
@@ -70,9 +70,9 @@ public class UsersDbClient {
                             }
                     ).toArray(AuthorityEntity[]::new);
 
-                    authAuthorityDao.createUser(authorityEntities);
+                    authAuthoritySpringDao.createUser(authorityEntities);
                     return UserJson.fromEntity(
-                            udUserDao.createUser(UserEntity.fromJson(user)),
+                            udUserSpringDao.createUser(UserEntity.fromJson(user)),
                             null
                     );
                 }
@@ -115,7 +115,7 @@ public class UsersDbClient {
         authUser.setAccountNonLocked(true);
         authUser.setCredentialsNonExpired(true);
 
-        AuthUserEntity createdAuthUser = authUserDao.createUser(authUser);
+        AuthUserEntity createdAuthUser = authUserSpringDao.createUser(authUser);
 
         AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                 e -> {
@@ -126,9 +126,9 @@ public class UsersDbClient {
                 }
         ).toArray(AuthorityEntity[]::new);
 
-        authAuthorityDao.createUser(authorityEntities);
+        authAuthoritySpringDao.createUser(authorityEntities);
         return UserJson.fromEntity(
-                udUserDao.createUser(UserEntity.fromJson(user)),
+                udUserSpringDao.createUser(UserEntity.fromJson(user)),
                 null
         );
     }
@@ -143,7 +143,7 @@ public class UsersDbClient {
                     authUser.setAccountNonLocked(true);
                     authUser.setCredentialsNonExpired(true);
 
-                    AuthUserEntity createdAuthUser = authUserDao.createUser(authUser);
+                    AuthUserEntity createdAuthUser = authUserSpringDao.createUser(authUser);
 
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
@@ -154,9 +154,9 @@ public class UsersDbClient {
                             }
                     ).toArray(AuthorityEntity[]::new);
 
-                    authAuthorityDao.createUser(authorityEntities);
+                    authAuthoritySpringDao.createUser(authorityEntities);
                     return UserJson.fromEntity(
-                            udUserDao.createUser(UserEntity.fromJson(user)),
+                            udUserSpringDao.createUser(UserEntity.fromJson(user)),
                             null
                     );
                 }

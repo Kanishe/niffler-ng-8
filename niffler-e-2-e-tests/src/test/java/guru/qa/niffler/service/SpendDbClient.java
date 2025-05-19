@@ -17,6 +17,10 @@ public class SpendDbClient {
 
     private static final Config CFG = Config.getInstance();
 
+    private final CategoryDAOSpringJdbc categoryDAOSpringJdbc = new CategoryDAOSpringJdbc();
+    private final SpendDAOSpringJdbc spendDAOSpringJdbc = new SpendDAOSpringJdbc();
+
+
     public SpendJson createSpend(SpendJson spend) {
         return transaction(connection -> {
             SpendEntity spendEntity = SpendEntity.fromJson(spend);
@@ -42,12 +46,12 @@ public class SpendDbClient {
     public SpendJson createSpendSpringJdbc(SpendJson spend) {
         SpendEntity spendEntity = SpendEntity.fromJson(spend);
         if (spendEntity.getCategory().getId() == null) {
-            CategoryEntity categoryEntity = new CategoryDAOSpringJdbc()
+            CategoryEntity categoryEntity = categoryDAOSpringJdbc
                     .create(spendEntity.getCategory());
             spendEntity.setCategory(categoryEntity);
         }
         return SpendJson.fromEntity(
-                new SpendDAOSpringJdbc()
+                spendDAOSpringJdbc
                         .createSpend(spendEntity)
         );
     }

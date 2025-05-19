@@ -19,6 +19,11 @@ public class AuthUserDbClient {
     private static final Config CFG = Config.getInstance();
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
+    private final AuthUserDAOSpringJdbc authUserDAOSpringJdbc = new AuthUserDAOSpringJdbc();
+    private final AuthAuthorityDAOSpringJdbc authAuthorityDAOSpringJdbc = new AuthAuthorityDAOSpringJdbc();
+    private final UserdataUserDAOSpringJdbc userdataUserDAOSpringJdbc = new UserdataUserDAOSpringJdbc();
+
+
     public UserJson createUserSpringJdbc(UserJson user) {
         AuthUserEntity authUserEntity = new AuthUserEntity();
         authUserEntity.setUsername(user.username());
@@ -28,7 +33,7 @@ public class AuthUserDbClient {
         authUserEntity.setAccountNonLocked(true);
         authUserEntity.setCredentialsNonExpired(true);
 
-        AuthUserEntity createdAuthUser = new AuthUserDAOSpringJdbc().createUser(authUserEntity);
+        AuthUserEntity createdAuthUser = authUserDAOSpringJdbc.createUser(authUserEntity);
         AuthorityEntity[] userAuthorities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
@@ -38,10 +43,11 @@ public class AuthUserDbClient {
                 }).toArray(AuthorityEntity[]::new);
 
 
-        new AuthAuthorityDAOSpringJdbc().createUser(userAuthorities);
-        return UserJson.fromEntity(new UserdataUserDAOSpringJdbc().createUser(
-                UserEntity.fromJson(user)
-        ), null);
+        authAuthorityDAOSpringJdbc.createUser(userAuthorities);
+        return UserJson.fromEntity(userdataUserDAOSpringJdbc.createUser(
+                        UserEntity.fromJson(user)
+                ),
+                null);
     }
 
 }
