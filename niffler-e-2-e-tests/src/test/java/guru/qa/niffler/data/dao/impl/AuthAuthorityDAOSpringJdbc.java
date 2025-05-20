@@ -1,25 +1,25 @@
 package guru.qa.niffler.data.dao.impl;
 
+import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthAuthorityDAO;
 import guru.qa.niffler.data.entity.userAuth.AuthorityEntity;
+import guru.qa.niffler.data.mapper.AuthorityEntityRowMapper;
+import guru.qa.niffler.data.tpl.DataSources;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 public class AuthAuthorityDAOSpringJdbc implements AuthAuthorityDAO {
 
-    private final DataSource dataSource;
+    private static final Config CFG = Config.getInstance();
 
-    public AuthAuthorityDAOSpringJdbc(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     @Override
     public void createUser(AuthorityEntity... authority) {
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         jdbcTemplate.batchUpdate(
                 "INSERT INTO authority (user_id, authority) VALUES (?, ?)",
                 new BatchPreparedStatementSetter() {
@@ -34,6 +34,15 @@ public class AuthAuthorityDAOSpringJdbc implements AuthAuthorityDAO {
                         return authority.length;
                     }
                 }
+        );
+    }
+
+    @Override
+    public List<AuthorityEntity> findAll() {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
+        return jdbcTemplate.query(
+                "SELECT * FROM authority",
+                AuthorityEntityRowMapper.instance
         );
     }
 }

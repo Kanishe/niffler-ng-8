@@ -55,6 +55,28 @@ public class DataBases {
         }
     }
 
+    public static void transaction(Consumer<Connection> consumer, String jdbcUrl, int isolationLevel) {
+        Connection connection = null;
+        try {
+            connection = connection(jdbcUrl);
+            connection.setTransactionIsolation(isolationLevel);
+            connection.setAutoCommit(false);
+            consumer.accept(connection);
+            connection.commit();
+            connection.setAutoCommit(true);
+        } catch (SQLException e) {
+            if (connection != null) {
+                try {
+                    connection.rollback();
+                    connection.setAutoCommit(true);
+                } catch (SQLException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> T xaTransaction(XaFunction<T>... actions) {
         return xaTransaction(TRANSACTION_READ_COMMITTED, actions);
     }
@@ -81,27 +103,7 @@ public class DataBases {
         }
     }
 
-    public static void transaction(Consumer<Connection> consumer, String jdbcUrl, int isolationLevel) {
-        Connection connection = null;
-        try {
-            connection = connection(jdbcUrl);
-            connection.setTransactionIsolation(isolationLevel);
-            connection.setAutoCommit(false);
-            consumer.accept(connection);
-            connection.commit();
-            connection.setAutoCommit(true);
-        } catch (SQLException e) {
-            if (connection != null) {
-                try {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
-                } catch (SQLException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-            throw new RuntimeException(e);
-        }
-    }
+
 
     public static DataSource dataSource(String jdbcUrl) {
         return dataSources.computeIfAbsent(
@@ -116,7 +118,7 @@ public class DataBases {
                     props.put("user", "postgres");
                     props.put("password", "secret");
                     dsBean.setXaProperties(props);
-                    dsBean.setPoolSize(10);
+                    dsBean.setMaxPoolSize(10);
                     return dsBean;
                 }
         );

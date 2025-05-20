@@ -12,22 +12,17 @@ import guru.qa.niffler.model.UserJson;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
-
-import static guru.qa.niffler.data.DataBases.dataSource;
 
 public class AuthUserDbClient {
 
     private static final Config CFG = Config.getInstance();
-    private final DataSource authDataSource = dataSource(CFG.authJdbcUrl());
-    private final DataSource userDataDataSource = dataSource(CFG.userdataJdbcUrl());
-
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 
-    private final AuthUserDAOSpringJdbc authUserDAO = new AuthUserDAOSpringJdbc(authDataSource);
-    private final AuthAuthorityDAOSpringJdbc authAuthorityDAO = new AuthAuthorityDAOSpringJdbc(authDataSource);
-    private final UserdataUserDAOSpringJdbc userdataUserDAO = new UserdataUserDAOSpringJdbc(userDataDataSource);
+    private final AuthUserDAOSpringJdbc authUserDAOSpringJdbc = new AuthUserDAOSpringJdbc();
+    private final AuthAuthorityDAOSpringJdbc authAuthorityDAOSpringJdbc = new AuthAuthorityDAOSpringJdbc();
+    private final UserdataUserDAOSpringJdbc userdataUserDAOSpringJdbc = new UserdataUserDAOSpringJdbc();
+
 
     public UserJson createUserSpringJdbc(UserJson user) {
         AuthUserEntity authUserEntity = new AuthUserEntity();
@@ -38,7 +33,7 @@ public class AuthUserDbClient {
         authUserEntity.setAccountNonLocked(true);
         authUserEntity.setCredentialsNonExpired(true);
 
-        AuthUserEntity createdAuthUser = authUserDAO.createUser(authUserEntity);
+        AuthUserEntity createdAuthUser = authUserDAOSpringJdbc.createUser(authUserEntity);
         AuthorityEntity[] userAuthorities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
@@ -48,11 +43,11 @@ public class AuthUserDbClient {
                 }).toArray(AuthorityEntity[]::new);
 
 
-        authAuthorityDAO.createUser(userAuthorities);
-        return UserJson.fromEntity(userdataUserDAO.createUser(
-                UserEntity.fromJson(user)
-
-        ), null);
+        authAuthorityDAOSpringJdbc.createUser(userAuthorities);
+        return UserJson.fromEntity(userdataUserDAOSpringJdbc.createUser(
+                        UserEntity.fromJson(user)
+                ),
+                null);
     }
 
 }
