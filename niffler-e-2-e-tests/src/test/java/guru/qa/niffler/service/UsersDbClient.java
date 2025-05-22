@@ -7,9 +7,9 @@ import guru.qa.niffler.data.dao.UserDAO;
 import guru.qa.niffler.data.dao.impl.AuthAuthorityDAOSpringJdbc;
 import guru.qa.niffler.data.dao.impl.AuthUserDAOSpringJdbc;
 import guru.qa.niffler.data.dao.impl.UserdataUserDAOSpringJdbc;
-import guru.qa.niffler.data.entity.userAuth.AuthUserEntity;
-import guru.qa.niffler.data.entity.userAuth.Authority;
-import guru.qa.niffler.data.entity.userAuth.AuthorityEntity;
+import guru.qa.niffler.data.entity.auth.AuthUserEntity;
+import guru.qa.niffler.data.entity.auth.Authority;
+import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.UserJson;
@@ -64,7 +64,9 @@ public class UsersDbClient {
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
                                 AuthorityEntity ae = new AuthorityEntity();
-                                ae.setUserId(createdAuthUser.getId());
+                                UserEntity ue = new UserEntity();
+                                ue.setId(createdAuthUser.getId());
+                                ae.setUser(ue);
                                 ae.setAuthority(e);
                                 return ae;
                             }
@@ -93,7 +95,9 @@ public class UsersDbClient {
         AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
-                    ae.setUserId(createdAuthUser.getId());
+                    UserEntity ue = new UserEntity();
+                    ue.setId(createdAuthUser.getId());
+                    ae.setUser(ue);
                     ae.setAuthority(e);
                     return ae;
                 }
@@ -120,7 +124,9 @@ public class UsersDbClient {
         AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
-                    ae.setUserId(createdAuthUser.getId());
+                    UserEntity ue = new UserEntity();
+                    ue.setId(createdAuthUser.getId());
+                    ae.setUser(ue);
                     ae.setAuthority(e);
                     return ae;
                 }
@@ -148,7 +154,9 @@ public class UsersDbClient {
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
                                 AuthorityEntity ae = new AuthorityEntity();
-                                ae.setUserId(createdAuthUser.getId());
+                                UserEntity ue = new UserEntity();
+                                ue.setId(createdAuthUser.getId());
+                                ae.setUser(ue);
                                 ae.setAuthority(e);
                                 return ae;
                             }
@@ -178,7 +186,9 @@ public class UsersDbClient {
                     AuthorityEntity[] authorityEntities = Arrays.stream(Authority.values()).map(
                             e -> {
                                 AuthorityEntity ae = new AuthorityEntity();
-                                ae.setUserId(createdAuthUser.getId());
+                                UserEntity ue = new UserEntity();
+                                ue.setId(createdAuthUser.getId());
+                                ae.setUser(ue);
                                 ae.setAuthority(e);
                                 return ae;
                             }
@@ -217,7 +227,7 @@ public class UsersDbClient {
                         (authUserEntity) -> {
                             List<AuthorityEntity> allList = authAuthoritySpringDao.findAll();
                             count.set((int) allList.stream()
-                                    .filter(authority -> authority.getUserId()
+                                    .filter(authority -> authority.getUser().getId()
                                             .equals(authUserEntity.getId()))
                                     .count());
                         }

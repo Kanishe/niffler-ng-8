@@ -2,7 +2,7 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.SpendDAO;
-import guru.qa.niffler.data.entity.category.CategoryEntity;
+import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
@@ -147,7 +147,7 @@ public class SpendDAOJdbc implements SpendDAO {
                     se.setSpendDate((rs.getDate("spend_date")));
                     se.setAmount(rs.getDouble("amount"));
                     se.setDescription(rs.getString("description"));
-                    se.setCategory(new CategoryEntity(rs.getObject("category_id", UUID.class)));
+                    se.setCategory(rs.getObject("category_id", CategoryEntity.class));
                     result.add(se);
                 }
                 return result;

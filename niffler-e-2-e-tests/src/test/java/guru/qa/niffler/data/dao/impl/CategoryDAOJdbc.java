@@ -2,7 +2,7 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.CategoryDAO;
-import guru.qa.niffler.data.entity.category.CategoryEntity;
+import guru.qa.niffler.data.entity.spend.CategoryEntity;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class CategoryDAOJdbc implements CategoryDAO {
         )) {
             ps.setString(1, category.getUsername());
             ps.setString(2, category.getName());
-            ps.setBoolean(3, category.getArchived());
+            ps.setBoolean(3, category.isArchived());
             ps.executeUpdate();
             final UUID generatedKey;
             try (ResultSet rs = ps.getGeneratedKeys()) {

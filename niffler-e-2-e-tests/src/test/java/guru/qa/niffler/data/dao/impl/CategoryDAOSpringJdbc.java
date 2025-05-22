@@ -2,7 +2,7 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.CategoryDAO;
-import guru.qa.niffler.data.entity.category.CategoryEntity;
+import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.mapper.CategoryEntityRowMapper;
 import guru.qa.niffler.data.tpl.DataSources;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,7 +31,7 @@ public class CategoryDAOSpringJdbc implements CategoryDAO {
                             Statement.RETURN_GENERATED_KEYS);
                     ps.setString(1, category.getUsername());
                     ps.setString(2, category.getName());
-                    ps.setBoolean(3, category.getArchived());
+                    ps.setBoolean(3, category.isArchived());
                     return ps;
                 }, kh
         );

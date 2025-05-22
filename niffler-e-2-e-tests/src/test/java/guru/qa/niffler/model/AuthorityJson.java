@@ -1,8 +1,8 @@
 package guru.qa.niffler.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import guru.qa.niffler.data.entity.userAuth.Authority;
-import guru.qa.niffler.data.entity.userAuth.AuthorityEntity;
+import guru.qa.niffler.data.entity.auth.Authority;
+import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 
 import java.util.UUID;
 
@@ -19,6 +19,6 @@ public record AuthorityJson(@JsonProperty("id")
         return new AuthorityJson(
                 entity.getId(),
                 entity.getAuthority(),
-                entity.getUserId());
+                entity.getUser().getId());
     }
 }
