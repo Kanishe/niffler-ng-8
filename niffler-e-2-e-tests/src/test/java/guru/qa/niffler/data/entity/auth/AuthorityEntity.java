@@ -1,15 +1,16 @@
 package guru.qa.niffler.data.entity.auth;
 
-import guru.qa.niffler.data.entity.userdata.UserEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+@ToString
 @Getter
 @Setter
 @Entity
@@ -27,7 +28,7 @@ public class AuthorityEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private AuthUserEntity user;
 
     @Override
     public final boolean equals(Object o) {

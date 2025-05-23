@@ -33,20 +33,16 @@ public class AuthUserDbClient {
         authUserEntity.setAccountNonLocked(true);
         authUserEntity.setCredentialsNonExpired(true);
 
-        AuthUserEntity createdAuthUser = authUserDAOSpringJdbc.createUser(authUserEntity);
+        AuthUserEntity createdAuthUser = authUserDAOSpringJdbc.create(authUserEntity);
         AuthorityEntity[] userAuthorities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
-                    UserEntity ue = new UserEntity();
-                    ue.setId(createdAuthUser.getId());;
-                    ae.setUser(ue);
-//                    ae.setUser(createdAuthUser.getId());
+                    ae.setUser(createdAuthUser);
                     ae.setAuthority(e);
                     return ae;
                 }).toArray(AuthorityEntity[]::new);
 
-
-        authAuthorityDAOSpringJdbc.createUser(userAuthorities);
+        authAuthorityDAOSpringJdbc.create(userAuthorities);
         return UserJson.fromEntity(userdataUserDAOSpringJdbc.createUser(
                         UserEntity.fromJson(user)
                 ),

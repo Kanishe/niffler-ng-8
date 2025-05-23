@@ -20,7 +20,7 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO {
     private static final Config CFG = Config.getInstance();
 
     @Override
-    public AuthUserEntity createUser(AuthUserEntity user) {
+    public AuthUserEntity create(AuthUserEntity user) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {

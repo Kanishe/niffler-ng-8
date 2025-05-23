@@ -18,7 +18,7 @@ public class AuthAuthorityDAOSpringJdbc implements AuthAuthorityDAO {
 
 
     @Override
-    public void createUser(AuthorityEntity... authority) {
+    public void create(AuthorityEntity... authority) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         jdbcTemplate.batchUpdate(
                 "INSERT INTO authority (user_id, authority) VALUES (?, ?)",

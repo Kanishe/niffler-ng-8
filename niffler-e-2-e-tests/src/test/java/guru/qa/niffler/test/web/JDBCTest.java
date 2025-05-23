@@ -17,6 +17,25 @@ import static utils.FakerGenUtil.*;
 public class JDBCTest {
 
     @Test
+    void springJdbcTest() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+        UserJson user = usersDbClient.create(
+                new UserJson(
+                        null,
+                        genRandomName(),
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+        System.out.println(user);
+    }
+
+    @Test
     void authSpringJdbcTest() {
         AuthUserDbClient authUserDbClient = new AuthUserDbClient();
         UserJson user = authUserDbClient.createUserSpringJdbc(
@@ -163,7 +182,7 @@ public class JDBCTest {
                 null,
                 null
         );
-        UserJson createdUser = usersDbClient.createUserJdbcWithOutTransactions(user);
+        UserJson createdUser = usersDbClient.createUserJdbcWithoutTransactions(user);
         System.out.println(createdUser);
 
         assertTrue(usersDbClient.isUserCreatedInUd(createdUser.id()));
