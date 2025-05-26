@@ -1,5 +1,8 @@
 package guru.qa.niffler.test.web;
 
+import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.data.repository.impl.jdbc.SpendRepositoryJdbc;
+import guru.qa.niffler.data.repository.impl.spring.SpendRepositorySpringJdbc;
 import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
@@ -10,6 +13,7 @@ import guru.qa.niffler.service.UsersDbClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static utils.FakerGenUtil.*;
@@ -173,7 +177,7 @@ public class JDBCTest {
 
         UserJson user = new UserJson(
                 null,
-               genRandomName(),
+                genRandomName(),
                 null,
                 null,
                 null,
@@ -188,5 +192,126 @@ public class JDBCTest {
         assertTrue(usersDbClient.isUserCreatedInUd(createdUser.id()));
         assertTrue(usersDbClient.isUserCreatedInUserAuth(createdUser.username()));
         assertTrue(usersDbClient.isAllAuthoritiesCreated(createdUser.username()));
+    }
+
+    @Test
+    void spendRepositoryJdbcTest() {
+        SpendRepositoryJdbc spendRepositoryJdbc = new SpendRepositoryJdbc();
+        SpendEntity spend = SpendEntity.fromJson(
+                new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
+                                null,
+                                genRandomName(),
+                                genRandomCommerceName(),
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        100.0,
+                        genRandomCommerceName(),
+                        genRandomEmail()
+                )
+        );
+        SpendEntity spendEntity = spendRepositoryJdbc.create(spend);
+
+        Optional<SpendEntity> spendById = spendRepositoryJdbc.findSpendById(spendEntity.getId());
+        SpendJson spendJsonById = SpendJson.fromEntity(spendById.orElseThrow());
+        System.out.println(spendJsonById);
+    }
+
+    @Test
+    void spendRepositorySpringJdbc() {
+        SpendRepositorySpringJdbc spendRepositoryJdbc = new SpendRepositorySpringJdbc();
+        SpendEntity spend = SpendEntity.fromJson(
+                new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
+                                null,
+                                genRandomName(),
+                                genRandomCommerceName(),
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        100.0,
+                        genRandomName(),
+                        genRandomCommerceName()
+                )
+        );
+        SpendEntity spendEntity = spendRepositoryJdbc.create(spend);
+
+        Optional<SpendEntity> spendById = spendRepositoryJdbc.findSpendById(spendEntity.getId());
+        SpendJson spendJsonById = SpendJson.fromEntity(spendById.orElseThrow());
+        System.out.println(spendJsonById);
+    }
+
+    //добавление друзей пользователей со связью в
+    @Test
+    void addFriendsWithFriendship() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+        UserJson firstFriend = usersDbClient.xaCreateUserRepository(
+                new UserJson(
+                        null,
+                        genRandomPassword() + "firstFriend",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        UserJson secondFriend = usersDbClient.xaCreateUserRepository(
+                new UserJson(
+                        null,
+                        genRandomPassword() + "secondFriend ",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        usersDbClient.addFriend(firstFriend, secondFriend);
+    }
+
+    @Test
+    void addFriendsWithInvitation() {
+        UsersDbClient usersDbClient = new UsersDbClient();
+        UserJson firstFriend = usersDbClient.xaCreateUserRepository(
+                new UserJson(
+                        null,
+                        genRandomPassword() + "firstFriend",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        UserJson secondFriend = usersDbClient.xaCreateUserRepository(
+                new UserJson(
+                        null,
+                        genRandomPassword() + "secondFriend ",
+                        null,
+                        null,
+                        null,
+                        CurrencyValues.RUB,
+                        null,
+                        null,
+                        null
+                )
+        );
+
+        usersDbClient.addInvitation(firstFriend, secondFriend);
     }
 }
