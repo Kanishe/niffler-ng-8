@@ -3,10 +3,7 @@ package guru.qa.niffler.data.entity.spend;
 import guru.qa.niffler.model.CategoryJson;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.Remove;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.io.Serializable;
