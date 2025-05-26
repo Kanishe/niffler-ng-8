@@ -19,6 +19,7 @@ buildscript {
         springDataCommonsVersion = '3.3.3'
         wiremockVersion = '3.0.1'
         fakerVersion = '1.0.2'
+        simpleJndiVersion ='0.25.0'
         userdataWsdlUrl = System.getProperty("test.env") == "docker"
                 ? "http://userdata.niffler.dc:8089/ws/userdata.wsdl"
                 : "http://127.0.0.1:8089/ws/userdata.wsdl"
@@ -104,6 +105,7 @@ dependencies {
     testImplementation("com.github.javafaker:javafaker:${fakerVersion}") {
         exclude group: 'org.yaml'
     }
+    testImplementation "com.github.h-thurow:simple-jndi:${simpleJndiVersion}"
     testImplementation 'commons-io:commons-io:2.16.1'
     testImplementation 'com.google.code.findbugs:jsr305:3.0.2'
     testImplementation 'com.github.vertical-blank:sql-formatter:2.0.5'

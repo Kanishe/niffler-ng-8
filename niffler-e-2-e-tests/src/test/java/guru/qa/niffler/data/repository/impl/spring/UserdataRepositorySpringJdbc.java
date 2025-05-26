@@ -61,6 +61,12 @@ public class UserdataRepositorySpringJdbc implements UserdataRepository {
     }
 
     @Override
+    public Optional<UserEntity> findByUsername(String username) {
+        //todo
+        return Optional.empty();
+    }
+
+    @Override
     public void addFriendshipRequest(UserEntity requester, UserEntity addressee) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
         jdbcTemplate.update(

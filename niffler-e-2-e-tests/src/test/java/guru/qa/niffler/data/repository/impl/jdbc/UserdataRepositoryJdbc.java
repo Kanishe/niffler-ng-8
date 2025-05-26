@@ -64,7 +64,7 @@ public class UserdataRepositoryJdbc implements UserdataRepository {
 
                     ue.setId(rs.getObject("id", UUID.class));
                     ue.setUsername(rs.getString("username"));
-                    ue.setCurrency(rs.getObject("currency", CurrencyValues.class));
+                    ue.setCurrency(CurrencyValues.valueOf(rs.getString("currency")));
                     ue.setFirstname(rs.getString("firstname"));
                     ue.setSurname(rs.getString("surname"));
                     ue.setPhoto(rs.getBytes("photo"));
@@ -79,6 +79,12 @@ public class UserdataRepositoryJdbc implements UserdataRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Optional<UserEntity> findByUsername(String username) {
+        //todo
+        return Optional.empty();
     }
 
     @Override

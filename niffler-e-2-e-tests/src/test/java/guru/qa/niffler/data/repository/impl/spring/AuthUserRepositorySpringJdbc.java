@@ -5,6 +5,7 @@ import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.extractor.AuthUserEntityExtractor;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.tpl.DataSources;
+import guru.qa.niffler.exceptions.ShouldResolveException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -81,5 +82,11 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
                         id
                 )
         );
+    }
+
+    @Override
+    public Optional<AuthUserEntity> findByUsername(String username) {
+        //todo
+        throw new ShouldResolveException("must resolve");
     }
 }
