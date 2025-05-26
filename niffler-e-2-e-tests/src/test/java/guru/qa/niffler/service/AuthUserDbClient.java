@@ -4,9 +4,9 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.impl.AuthAuthorityDAOSpringJdbc;
 import guru.qa.niffler.data.dao.impl.AuthUserDAOSpringJdbc;
 import guru.qa.niffler.data.dao.impl.UserdataUserDAOSpringJdbc;
-import guru.qa.niffler.data.entity.userAuth.AuthUserEntity;
-import guru.qa.niffler.data.entity.userAuth.Authority;
-import guru.qa.niffler.data.entity.userAuth.AuthorityEntity;
+import guru.qa.niffler.data.entity.auth.AuthUserEntity;
+import guru.qa.niffler.data.entity.auth.Authority;
+import guru.qa.niffler.data.entity.auth.AuthorityEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.UserJson;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -33,17 +33,16 @@ public class AuthUserDbClient {
         authUserEntity.setAccountNonLocked(true);
         authUserEntity.setCredentialsNonExpired(true);
 
-        AuthUserEntity createdAuthUser = authUserDAOSpringJdbc.createUser(authUserEntity);
+        AuthUserEntity createdAuthUser = authUserDAOSpringJdbc.create(authUserEntity);
         AuthorityEntity[] userAuthorities = Arrays.stream(Authority.values()).map(
                 e -> {
                     AuthorityEntity ae = new AuthorityEntity();
-                    ae.setUserId(createdAuthUser.getId());
+                    ae.setUser(createdAuthUser);
                     ae.setAuthority(e);
                     return ae;
                 }).toArray(AuthorityEntity[]::new);
 
-
-        authAuthorityDAOSpringJdbc.createUser(userAuthorities);
+        authAuthorityDAOSpringJdbc.create(userAuthorities);
         return UserJson.fromEntity(userdataUserDAOSpringJdbc.createUser(
                         UserEntity.fromJson(user)
                 ),

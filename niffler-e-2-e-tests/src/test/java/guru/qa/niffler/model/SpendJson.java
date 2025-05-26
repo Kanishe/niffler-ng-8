@@ -1,7 +1,7 @@
 package guru.qa.niffler.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import guru.qa.niffler.data.entity.category.CategoryEntity;
+import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 
 import java.util.Date;
@@ -34,7 +34,7 @@ public record SpendJson(
                         category.getId(),
                         category.getName(),
                         username,
-                        category.getArchived()
+                        category.isArchived()
                 ),
                 entity.getCurrency(),
                 entity.getAmount(),
