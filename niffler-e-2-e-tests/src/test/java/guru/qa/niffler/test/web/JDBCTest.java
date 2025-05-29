@@ -7,10 +7,12 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
-import guru.qa.niffler.service.AuthUserDbClient;
-import guru.qa.niffler.service.SpendDbClient;
-import guru.qa.niffler.service.UsersDbClient;
+import guru.qa.niffler.service.impl.AuthUserDbClient;
+import guru.qa.niffler.service.impl.SpendDbClient;
+import guru.qa.niffler.service.impl.UsersDbClient;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Date;
 import java.util.Optional;
@@ -62,6 +64,28 @@ public class JDBCTest {
     void createSpendJdbcTest() {
         SpendDbClient spendDbClient = new SpendDbClient();
         SpendJson spendJson = spendDbClient.createSpendSpringJdbc(
+                new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
+                                null,
+                                genRandomName(),
+                                genRandomCommerceName(),
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        1111.00,
+                        genRandomName(),
+                        genRandomName()
+                )
+        );
+        System.out.println(spendJson);
+    }
+
+    @Test
+    void createSpendJdbcTest2() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        SpendJson spendJson = spendDbClient.createSpend(
                 new SpendJson(
                         null,
                         new Date(),
@@ -313,5 +337,34 @@ public class JDBCTest {
         );
 
         usersDbClient.addInvitation(firstFriend, secondFriend);
+    }
+
+    static UsersDbClient usersDbClient = new UsersDbClient();
+
+    @ValueSource(strings = {
+            "valera10"
+    })
+    @ParameterizedTest
+    void springJdbcTestJNDI() {
+        UserJson user = usersDbClient.createUsingJNDI(
+                genRandomName(),
+                genRandomPassword()
+        );
+        usersDbClient.addInvitationJDNI(user, 1);
+        System.out.println(user);
+    }
+
+    @ValueSource(strings = {
+            "xaCreateUserHibernateRepository17",
+    })
+    @ParameterizedTest
+    void xaCreateUserHibernateRepository(String username) {
+        UsersDbClient userDbClient = new UsersDbClient();
+
+        UserJson user = userDbClient.xaCreateUserHibernateRepository(
+                username, "12345"
+        );
+        userDbClient.addIncomeInvitation(user, 1);
+        userDbClient.addOutcomeInvitation(user, 1);
     }
 }

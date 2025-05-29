@@ -53,6 +53,32 @@ public class AuthUserDAOJdbc implements AuthUserDAO {
     }
 
     @Override
+    public AuthUserEntity update(AuthUserEntity user) {
+        try (PreparedStatement userPs = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+                "UPDATE \"user\" SET " +
+                        "username = ?," +
+                        "password = ?," +
+                        "enabled = ?," +
+                        "account_non_expired = ?," +
+                        "account_non_locked = ?," +
+                        "credentials_non_expired = ?" +
+                        "WHERE id = ?"
+        )) {
+            userPs.setString(1, user.getUsername());
+            userPs.setString(2, user.getPassword());
+            userPs.setBoolean(3, user.getEnabled());
+            userPs.setBoolean(4, user.getAccountNonExpired());
+            userPs.setBoolean(5, user.getAccountNonLocked());
+            userPs.setBoolean(6, user.getCredentialsNonExpired());
+            userPs.setObject(7, user.getId());
+            userPs.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+    @Override
     public Optional<AuthUserEntity> findById(UUID id) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "SELECT * FROM \"user\" WHERE id = ?"
@@ -130,6 +156,17 @@ public class AuthUserDAOJdbc implements AuthUserDAO {
                 }
                 return result;
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void delete(UUID id) {
+        try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+                "DELETE FROM \"user\" WHERE id = ?"
+        )) {
+            ps.setObject(1, id);
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

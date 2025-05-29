@@ -1,6 +1,11 @@
 package guru.qa.niffler.data.repository.impl.spring;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.CategoryDAO;
+import guru.qa.niffler.data.dao.SpendDAO;
+import guru.qa.niffler.data.dao.impl.CategoryDAOSpringJdbc;
+import guru.qa.niffler.data.dao.impl.SpendDAOSpringJdbc;
+import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
 import guru.qa.niffler.data.extractor.SpendEntityExtractor;
 import guru.qa.niffler.data.repository.SpendRepository;
@@ -17,6 +22,9 @@ import java.util.UUID;
 public class SpendRepositorySpringJdbc implements SpendRepository {
 
     private static final Config CFG = Config.getInstance();
+
+    private final SpendDAO spendDAOSpringJdbc = new SpendDAOSpringJdbc();
+    private final CategoryDAO categoryDAOSpringJdbc = new CategoryDAOSpringJdbc();
 
     @Override
     public SpendEntity create(SpendEntity spend) {
@@ -73,5 +81,48 @@ public class SpendRepositorySpringJdbc implements SpendRepository {
                         id
                 )
         );
+    }
+
+    @Override
+    public SpendEntity update(SpendEntity spend) {
+        categoryDAOSpringJdbc.create(spend.getCategory());
+        spendDAOSpringJdbc.update(spend);
+        return spend;
+    }
+
+    @Override
+    public CategoryEntity createCategory(CategoryEntity category) {
+        categoryDAOSpringJdbc.create(category);
+        return category;
+    }
+
+    @Override
+    public Optional<CategoryEntity> findCategoryById(UUID id) {
+        return  categoryDAOSpringJdbc.findCategoryById(id);
+    }
+
+    @Override
+    public Optional<CategoryEntity> findCategoryByUsernameAndCategoryName(String username, String name) {
+        return categoryDAOSpringJdbc.findCategoryByUsernameAndCategoryName(username, name);
+    }
+
+    @Override
+    public Optional<SpendEntity> findById(UUID id) {
+        return spendDAOSpringJdbc.findSpendById(id);
+    }
+
+    @Override
+    public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
+        return spendDAOSpringJdbc.findByUsernameAndSpendDescription(username, description);
+    }
+
+    @Override
+    public void remove(SpendEntity spend) {
+        spendDAOSpringJdbc.deleteSpend(spend);
+    }
+
+    @Override
+    public void removeCategory(CategoryEntity category) {
+        categoryDAOSpringJdbc.deleteCategory(category);
     }
 }

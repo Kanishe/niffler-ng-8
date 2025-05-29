@@ -1,6 +1,10 @@
 package guru.qa.niffler.data.repository.impl.spring;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.CategoryDAO;
+import guru.qa.niffler.data.dao.UserDAO;
+import guru.qa.niffler.data.dao.impl.CategoryDAOSpringJdbc;
+import guru.qa.niffler.data.dao.impl.UserdataUserDAOSpringJdbc;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.mapper.UserdataUserEntityRowMapper;
 import guru.qa.niffler.data.repository.UserdataRepository;
@@ -23,6 +27,9 @@ import static guru.qa.niffler.data.tpl.Connections.holder;
 public class UserdataRepositorySpringJdbc implements UserdataRepository {
 
     private static final Config CFG = Config.getInstance();
+
+    private final UserDAO userdataUserDAOSpringJdbc = new UserdataUserDAOSpringJdbc();
+
 
     @Override
     public UserEntity create(UserEntity user) {
@@ -61,7 +68,13 @@ public class UserdataRepositorySpringJdbc implements UserdataRepository {
     }
 
     @Override
-    public void addFriendshipRequest(UserEntity requester, UserEntity addressee) {
+    public Optional<UserEntity> findByUsername(String username) {
+        //todo
+        return Optional.empty();
+    }
+
+    @Override
+    public void sentInitiation(UserEntity requester, UserEntity addressee) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.userdataJdbcUrl()));
         jdbcTemplate.update(
                 con -> {
@@ -99,5 +112,15 @@ public class UserdataRepositorySpringJdbc implements UserdataRepository {
                         return 2;
                     }
                 });
+    }
+
+    @Override
+    public UserEntity update(UserEntity user) {
+        return userdataUserDAOSpringJdbc.update(user);
+    }
+
+    @Override
+    public void remove(UserEntity user) {
+        userdataUserDAOSpringJdbc.delete(user);
     }
 }
