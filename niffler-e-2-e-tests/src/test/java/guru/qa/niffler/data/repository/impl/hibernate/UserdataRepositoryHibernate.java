@@ -15,25 +15,32 @@ import static guru.qa.niffler.data.jpa.EntityManagers.em;
 public class UserdataRepositoryHibernate implements UserdataRepository {
 
     private static final Config CFG = Config.getInstance();
-    private final EntityManager entityManager = em(CFG.userdataJdbcUrl());
+    private final EntityManager em = em(CFG.userdataJdbcUrl());
 
     @Override
     public UserEntity create(UserEntity user) {
-        entityManager.joinTransaction();
-        entityManager.persist(user);
+        em.joinTransaction();
+        em.persist(user);
+        return user;
+    }
+
+    @Override
+    public UserEntity update(UserEntity user) {
+        em.joinTransaction();
+        em.merge(user);
         return user;
     }
 
     @Override
     public Optional<UserEntity> findById(UUID id) {
         return Optional.ofNullable(
-                entityManager.find(UserEntity.class, id));
+                em.find(UserEntity.class, id));
     }
 
     @Override
     public Optional<UserEntity> findByUsername(String username) {
         try {
-            return Optional.of(entityManager.createQuery(
+            return Optional.of(em.createQuery(
                             "select u from UserEntity u where u.username =:username", UserEntity.class)
                     .setParameter("username", username)
                     .getSingleResult());
@@ -43,16 +50,22 @@ public class UserdataRepositoryHibernate implements UserdataRepository {
     }
 
     @Override
-    public void addFriendshipRequest(UserEntity requester, UserEntity addressee) {
-        entityManager.joinTransaction();
+    public void sentInitiation(UserEntity requester, UserEntity addressee) {
+        em.joinTransaction();
         requester.addFriends(FriendshipStatus.PENDING, addressee);
     }
 
     @Override
     public void addFriend(UserEntity requester, UserEntity addressee) {
-        entityManager.joinTransaction();
+        em.joinTransaction();
         requester.addFriends(FriendshipStatus.ACCEPTED, addressee);
         requester.addFriends(FriendshipStatus.ACCEPTED, requester);
 
+    }
+
+    @Override
+    public void remove(UserEntity user) {
+        em.joinTransaction();
+        em.remove(user);
     }
 }

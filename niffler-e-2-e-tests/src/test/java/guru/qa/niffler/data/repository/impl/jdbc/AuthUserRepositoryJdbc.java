@@ -79,7 +79,7 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
                 PreparedStatement userPs = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                         """
                                 UPDATE "user"
-                                SET\s
+                                SET
                                 username = ?,
                                 password = ?,
                                 enabled = ?,

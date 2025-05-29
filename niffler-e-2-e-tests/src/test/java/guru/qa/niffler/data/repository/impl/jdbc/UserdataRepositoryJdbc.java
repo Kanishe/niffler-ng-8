@@ -1,6 +1,8 @@
 package guru.qa.niffler.data.repository.impl.jdbc;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.UserDAO;
+import guru.qa.niffler.data.dao.impl.UserdataUserDAOJdbc;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.data.repository.UserdataRepository;
 import guru.qa.niffler.model.CurrencyValues;
@@ -19,6 +21,8 @@ import static guru.qa.niffler.data.tpl.Connections.holder;
 public class UserdataRepositoryJdbc implements UserdataRepository {
 
     private static final Config CFG = Config.getInstance();
+
+    private final UserDAO userdataUserDAOJdbc = new UserdataUserDAOJdbc();
 
     @Override
     public UserEntity create(UserEntity user) {
@@ -83,12 +87,16 @@ public class UserdataRepositoryJdbc implements UserdataRepository {
 
     @Override
     public Optional<UserEntity> findByUsername(String username) {
-        //todo
-        return Optional.empty();
+        return userdataUserDAOJdbc.findByUsername(username);
     }
 
     @Override
-    public void addFriendshipRequest(UserEntity requester, UserEntity addressee) {
+    public UserEntity update(UserEntity user) {
+        return userdataUserDAOJdbc.update(user);
+    }
+
+    @Override
+    public void sentInitiation(UserEntity requester, UserEntity addressee) {
         try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
                 "INSERT INTO friendship (requester_id, addressee_id, status) " +
                         "VALUES (?, ?, ? )"
@@ -120,5 +128,10 @@ public class UserdataRepositoryJdbc implements UserdataRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void remove(UserEntity user) {
+        userdataUserDAOJdbc.delete(user);
     }
 }

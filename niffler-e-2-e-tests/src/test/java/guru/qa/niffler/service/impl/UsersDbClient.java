@@ -1,4 +1,4 @@
-package guru.qa.niffler.service;
+package guru.qa.niffler.service.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.AuthAuthorityDAO;
@@ -22,6 +22,7 @@ import guru.qa.niffler.data.repository.impl.spring.UserdataRepositorySpringJdbc;
 import guru.qa.niffler.data.tpl.XaTransactionTemplate;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.UserJson;
+import guru.qa.niffler.service.UsersClient;
 import org.springframework.data.transaction.ChainedTransactionManager;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -37,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static guru.qa.niffler.data.tpl.DataSources.dataSource;
 import static utils.FakerGenUtil.*;
 
-public class UsersDbClient {
+public class UsersDbClient implements UsersClient {
 
     private static final Config CFG = Config.getInstance();
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -275,6 +276,30 @@ public class UsersDbClient {
     }
 
 
+    @Override
+    public UserJson createUser(UserJson user) {
+        return xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUserEntity = authUserEntity(user);
+            authUserRepository.create(authUserEntity);
+            return UserJson.fromEntity(
+                    userDataRepository.create(UserEntity.fromJson(user)
+                    ), null);
+        });
+    }
+
+    @Override
+    public UserJson createUser(String username, String password) {
+        return xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUserEntity = authUserEntityShort(username, password);
+
+            authUserRepository.create(authUserEntity);
+
+            return UserJson.fromEntity(
+                    userDataRepository.create(userEntityShort(username)
+                    ), null);
+        });
+    }
+
     public void addFriend(UserJson user, UserJson friend) {
         xaTransactionTemplate.execute(() -> {
             userDataRepository.addFriend(UserEntity.fromJson(user), UserEntity.fromJson(friend));
@@ -282,8 +307,43 @@ public class UsersDbClient {
         });
     }
 
+    @Override
+    public void addIncomeInvitation(UserJson targertUser, int count) {
+        if (count > 0) {
+            UserEntity targetEntity = userDataRepository.findById(targertUser.id()).orElseThrow();
+            for (int i = 0; i < count; i++) {
+                xaTransactionTemplate.execute(() -> {
+                    String username = genRandomName();
+                    AuthUserEntity authUser = authUserEntityShort(username, "12345");
+                    authUserRepository.create(authUser);
+                    UserEntity adressee = userDataRepository.create(userEntityShort(username));
+                    userDataRepository.sentInitiation(targetEntity, adressee);
+                    return null;
+                });
+            }
+        }
+    }
+
+    @Override
+    public void addOutcomeInvitation(UserJson targetUser, int count) {
+        if (count > 0) {
+            UserEntity targetEntity = userDataRepository.findById(targetUser.id()).orElseThrow();
+            for (int i = 0; i < count; i++) {
+                xaTransactionTemplate.execute(() -> {
+                            String username = genRandomName();
+                            AuthUserEntity authUser = authUserEntityShort(username, "12345");
+                            authUserRepository.create(authUser);
+                            UserEntity adressee = userDataRepository.create(userEntityShort(username));
+                            userDataRepository.sentInitiation(adressee, targetEntity);
+                            return null;
+                        }
+                );
+            }
+        }
+    }
+
     public void addInvitation(UserJson requester, UserJson addressee) {
-        userDataRepository.addFriendshipRequest(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
+        userDataRepository.sentInitiation(UserEntity.fromJson(requester), UserEntity.fromJson(addressee));
     }
 
     //Методы для проверки работы Hibernate и JDNI
@@ -305,12 +365,25 @@ public class UsersDbClient {
                             authUserRepository.create(authUser);
                             UserEntity addressee = userDataRepository.create(userEntityShort(username));
 
-                            userDataRepository.addFriendshipRequest(targetEntity, addressee);
+                            userDataRepository.sentInitiation(targetEntity, addressee);
                             return null;
                         }
                 );
             }
         }
+    }
+
+    //создание юзера с repository hibernate
+    public UserJson xaCreateUserHibernateRepository(String username, String password) {
+        return xaTransactionTemplate.execute(() -> {
+            AuthUserEntity authUserEntity = authUserEntityShort(username, password);
+
+            authUserRepositoryHibernate.create(authUserEntity);
+
+            return UserJson.fromEntity(
+                    userdataRepositoryHibernate.create(userEntityShort(username)
+                    ), null);
+        });
     }
 
     private AuthUserEntity authUserEntity(UserJson user) {
@@ -357,5 +430,4 @@ public class UsersDbClient {
         userEntity.setCurrency(CurrencyValues.RUB);
         return userEntity;
     }
-
 }

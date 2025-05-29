@@ -7,9 +7,9 @@ import guru.qa.niffler.model.CategoryJson;
 import guru.qa.niffler.model.CurrencyValues;
 import guru.qa.niffler.model.SpendJson;
 import guru.qa.niffler.model.UserJson;
-import guru.qa.niffler.service.AuthUserDbClient;
-import guru.qa.niffler.service.SpendDbClient;
-import guru.qa.niffler.service.UsersDbClient;
+import guru.qa.niffler.service.impl.AuthUserDbClient;
+import guru.qa.niffler.service.impl.SpendDbClient;
+import guru.qa.niffler.service.impl.UsersDbClient;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -330,5 +330,19 @@ public class JDBCTest {
         );
         usersDbClient.addInvitationJDNI(user, 1);
         System.out.println(user);
+    }
+
+    @ValueSource(strings = {
+            "xaCreateUserHibernateRepository17",
+    })
+    @ParameterizedTest
+    void xaCreateUserHibernateRepository(String username) {
+        UsersDbClient userDbClient = new UsersDbClient();
+
+        UserJson user = userDbClient.xaCreateUserHibernateRepository(
+                username, "12345"
+        );
+        userDbClient.addIncomeInvitation(user, 1);
+        userDbClient.addOutcomeInvitation(user, 1);
     }
 }

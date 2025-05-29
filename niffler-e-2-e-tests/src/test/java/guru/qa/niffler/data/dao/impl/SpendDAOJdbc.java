@@ -4,6 +4,7 @@ import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.SpendDAO;
 import guru.qa.niffler.data.entity.spend.CategoryEntity;
 import guru.qa.niffler.data.entity.spend.SpendEntity;
+import guru.qa.niffler.data.mapper.SpendEntityRowMapper;
 import guru.qa.niffler.model.CurrencyValues;
 
 import java.sql.*;
@@ -131,6 +132,28 @@ public class SpendDAOJdbc implements SpendDAO {
     }
 
     @Override
+    public Optional<SpendEntity> findByUsernameAndSpendDescription(String username, String description) {
+        try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
+                "SELECT * FROM spend WHERE username = ? AND description = ?"
+        )) {
+            ps.setObject(1, username);
+            ps.setObject(2, description);
+            ps.execute();
+            try (ResultSet rs = ps.getResultSet()) {
+                if (rs.next()) {
+                    return Optional.ofNullable(
+                            SpendEntityRowMapper.instance.mapRow(rs, rs.getRow())
+                    );
+                } else {
+                    return Optional.empty();
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public List<SpendEntity> findAll() {
         try (PreparedStatement ps = holder(CFG.spendJdbcUrl()).connection().prepareStatement
                 ("SELECT * FROM spend")) {
@@ -155,5 +178,35 @@ public class SpendDAOJdbc implements SpendDAO {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public SpendEntity update(SpendEntity spend) {
+        try (PreparedStatement psSpend = holder(CFG.spendJdbcUrl()).connection().prepareStatement(
+                """
+                        UPDATE "spend"
+                        SET
+                        username = ?,
+                        spend_date =?,
+                        currency = ?,
+                        amount = ?,
+                        description = ?,
+                        category_id = ?
+                        WHERE id = ?
+                        """
+        )) {
+            psSpend.setString(1, spend.getUsername());
+            psSpend.setDate(2, new Date(spend.getSpendDate().getTime()));
+            psSpend.setString(3, spend.getCurrency().name());
+            psSpend.setDouble(4, spend.getAmount());
+            psSpend.setString(5, spend.getDescription());
+            psSpend.setObject(6, spend.getCategory().getId());
+            psSpend.setObject(7, spend.getId());
+            psSpend.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return spend;
     }
 }
