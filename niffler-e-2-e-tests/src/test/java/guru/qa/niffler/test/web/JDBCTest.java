@@ -83,6 +83,28 @@ public class JDBCTest {
     }
 
     @Test
+    void createSpendJdbcTest2() {
+        SpendDbClient spendDbClient = new SpendDbClient();
+        SpendJson spendJson = spendDbClient.createSpend(
+                new SpendJson(
+                        null,
+                        new Date(),
+                        new CategoryJson(
+                                null,
+                                genRandomName(),
+                                genRandomCommerceName(),
+                                false
+                        ),
+                        CurrencyValues.RUB,
+                        1111.00,
+                        genRandomName(),
+                        genRandomName()
+                )
+        );
+        System.out.println(spendJson);
+    }
+
+    @Test
     void createUserSpringWithOutTx() {
         UsersDbClient usersDbClient = new UsersDbClient();
 
