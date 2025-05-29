@@ -42,6 +42,31 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO {
     }
 
     @Override
+    public AuthUserEntity update(AuthUserEntity user) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE \"user\" SET " +
+                            "username = ?," +
+                            "password = ?," +
+                            "enabled = ?," +
+                            "account_non_expired = ?," +
+                            "account_non_locked = ?," +
+                            "credentials_non_expired = ?" +
+                            "WHERE id = ?");
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword());
+            ps.setBoolean(3, user.getEnabled());
+            ps.setBoolean(4, user.getAccountNonExpired());
+            ps.setBoolean(5, user.getAccountNonLocked());
+            ps.setBoolean(6, user.getCredentialsNonExpired());
+            ps.setObject(7, user.getId());
+            return ps;
+        });
+        return user;
+    }
+
+    @Override
     public Optional<AuthUserEntity> findById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         return Optional.ofNullable(
@@ -64,5 +89,11 @@ public class AuthUserDAOSpringJdbc implements AuthUserDAO {
                 "SELECT * FROM \"user\"",
                 AuthUserEntityRowMapper.instance
         );
+    }
+
+    @Override
+    public void delete(UUID id) {
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
+        jdbcTemplate.update("DELETE FROM \"user\" WHERE id = ?", id);
     }
 }

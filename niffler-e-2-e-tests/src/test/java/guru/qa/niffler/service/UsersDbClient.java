@@ -35,7 +35,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static guru.qa.niffler.data.tpl.DataSources.dataSource;
-import static utils.FakerGenUtil.genRandomPassword;
+import static utils.FakerGenUtil.*;
 
 public class UsersDbClient {
 

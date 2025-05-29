@@ -318,6 +318,7 @@ public class JDBCTest {
     }
 
     static UsersDbClient usersDbClient = new UsersDbClient();
+
     @ValueSource(strings = {
             "valera10"
     })
@@ -327,7 +328,7 @@ public class JDBCTest {
                 genRandomName(),
                 genRandomPassword()
         );
-        usersDbClient.addInvitationJDNI(user,1);
+        usersDbClient.addInvitationJDNI(user, 1);
         System.out.println(user);
     }
 }

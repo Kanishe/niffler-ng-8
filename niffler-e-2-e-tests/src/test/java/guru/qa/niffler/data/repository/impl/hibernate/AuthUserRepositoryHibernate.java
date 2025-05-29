@@ -14,31 +14,44 @@ import static guru.qa.niffler.data.jpa.EntityManagers.em;
 public class AuthUserRepositoryHibernate implements AuthUserRepository {
 
     private static final Config CFG = Config.getInstance();
-    private final EntityManager entityManager = em(CFG.authJdbcUrl());
+    private final EntityManager em = em(CFG.authJdbcUrl());
 
     @Override
     public AuthUserEntity create(AuthUserEntity user) {
-        entityManager.joinTransaction();
-        entityManager.persist(user);
+        em.joinTransaction();
+        em.persist(user);
+        return user;
+    }
+
+    @Override
+    public AuthUserEntity update(AuthUserEntity user) {
+        em.joinTransaction();
+        em.merge(user);
         return user;
     }
 
     @Override
     public Optional<AuthUserEntity> findById(UUID id) {
         return Optional.ofNullable(
-                entityManager.find(AuthUserEntity.class, id)
+                em.find(AuthUserEntity.class, id)
         );
     }
 
     @Override
     public Optional<AuthUserEntity> findByUsername(String username) {
         try {
-            return Optional.of(entityManager.createQuery(
+            return Optional.of(em.createQuery(
                             "select u from UserEntity u where u.username =:username", AuthUserEntity.class)
                     .setParameter("username", username)
                     .getSingleResult());
         } catch (NoResultException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void remove(AuthUserEntity user) {
+        em.joinTransaction();
+        em.remove(user);
     }
 }

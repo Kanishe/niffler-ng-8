@@ -1,11 +1,12 @@
 package guru.qa.niffler.data.repository.impl.spring;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.AuthUserDAO;
+import guru.qa.niffler.data.dao.impl.AuthUserDAOSpringJdbc;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.extractor.AuthUserEntityExtractor;
 import guru.qa.niffler.data.repository.AuthUserRepository;
 import guru.qa.niffler.data.tpl.DataSources;
-import guru.qa.niffler.exceptions.ShouldResolveException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -21,6 +22,7 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
 
     private static final Config CFG = Config.getInstance();
 
+    private final AuthUserDAO authUserDAOSpringJdbc = new AuthUserDAOSpringJdbc();
 
     @Override
     public AuthUserEntity create(AuthUserEntity user) {
@@ -62,6 +64,12 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
     }
 
     @Override
+    public AuthUserEntity update(AuthUserEntity user) {
+        authUserDAOSpringJdbc.update(user);
+        return user;
+    }
+
+    @Override
     public Optional<AuthUserEntity> findById(UUID id) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(DataSources.dataSource(CFG.authJdbcUrl()));
         return Optional.ofNullable(
@@ -86,7 +94,11 @@ public class AuthUserRepositorySpringJdbc implements AuthUserRepository {
 
     @Override
     public Optional<AuthUserEntity> findByUsername(String username) {
-        //todo
-        throw new ShouldResolveException("must resolve");
+        return Optional.ofNullable(authUserDAOSpringJdbc.findByUsername(username)).get();
+    }
+
+    @Override
+    public void remove(AuthUserEntity user) {
+        authUserDAOSpringJdbc.delete(user.getId());
     }
 }
