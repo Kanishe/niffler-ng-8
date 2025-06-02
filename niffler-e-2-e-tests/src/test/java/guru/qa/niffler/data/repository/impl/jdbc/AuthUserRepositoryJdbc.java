@@ -1,6 +1,10 @@
 package guru.qa.niffler.data.repository.impl.jdbc;
 
 import guru.qa.niffler.config.Config;
+import guru.qa.niffler.data.dao.AuthAuthorityDAO;
+import guru.qa.niffler.data.dao.AuthUserDAO;
+import guru.qa.niffler.data.dao.impl.AuthAuthorityDAOJdbc;
+import guru.qa.niffler.data.dao.impl.AuthUserDAOJdbc;
 import guru.qa.niffler.data.entity.auth.AuthUserEntity;
 import guru.qa.niffler.data.entity.auth.Authority;
 import guru.qa.niffler.data.entity.auth.AuthorityEntity;
@@ -24,6 +28,9 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
 
     private static final PasswordEncoder pe = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     private static final Config CFG = Config.getInstance();
+
+    private final AuthUserDAO authUserDao = new AuthUserDAOJdbc();
+    private final AuthAuthorityDAO authAuthorityDao = new AuthAuthorityDAOJdbc();
 
     @Override
     public AuthUserEntity create(AuthUserEntity user) {
@@ -67,6 +74,35 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
     }
 
     @Override
+    public AuthUserEntity update(AuthUserEntity user) {
+        try (
+                PreparedStatement userPs = holder(CFG.authJdbcUrl()).connection().prepareStatement(
+                        """
+                                UPDATE "user"
+                                SET
+                                username = ?,
+                                password = ?,
+                                enabled = ?,
+                                account_non_expired = ?,
+                                account_non_locked = ?,
+                                credentials_non_expired = ?
+                                WHERE id = ?
+                                """
+                )) {
+            userPs.setObject(1, user.getId());
+            userPs.setString(2, user.getUsername());
+            userPs.setString(3, user.getPassword());
+            userPs.setBoolean(4, user.getEnabled());
+            userPs.setBoolean(5, user.getAccountNonExpired());
+            userPs.setBoolean(6, user.getAccountNonLocked());
+            userPs.setBoolean(7, user.getCredentialsNonExpired());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
+    }
+
+    @Override
     public Optional<AuthUserEntity> findById(UUID id) {
         try (PreparedStatement ps = holder(CFG.authJdbcUrl()).connection().prepareStatement(
                 "select * from \"user\" u join authority a on u.id = a.user_id where u.id = ?"
@@ -99,5 +135,15 @@ public class AuthUserRepositoryJdbc implements AuthUserRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Optional<AuthUserEntity> findByUsername(String username) {
+        return authUserDao.findByUsername(username);
+    }
+
+    @Override
+    public void remove(AuthUserEntity user) {
+        authUserDao.delete(user.getId());
     }
 }

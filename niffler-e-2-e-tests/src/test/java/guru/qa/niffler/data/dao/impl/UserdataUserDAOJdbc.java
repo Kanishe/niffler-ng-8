@@ -2,6 +2,7 @@ package guru.qa.niffler.data.dao.impl;
 
 import guru.qa.niffler.config.Config;
 import guru.qa.niffler.data.dao.UserDAO;
+import guru.qa.niffler.data.entity.userdata.FriendshipEntity;
 import guru.qa.niffler.data.entity.userdata.UserEntity;
 import guru.qa.niffler.model.CurrencyValues;
 
@@ -86,26 +87,43 @@ public class UserdataUserDAOJdbc implements UserDAO {
 
     @Override
     public UserEntity update(UserEntity user) {
-        try (PreparedStatement ps = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
-                "UPDATE user SET username=?, currency=?,firstname=?,surname=?," +
-                        "photo=?,photo_small=?,full_name=?" +
-                        " WHERE userid=? ")) {
-            ps.setString(1, user.getUsername());
-            ps.setString(2, user.getCurrency().name());
-            ps.setString(3, user.getFirstname());
-            ps.setString(4, user.getSurname());
-            ps.setBytes(5, user.getPhoto());
-            ps.setBytes(6, user.getPhotoSmall());
-            ps.setString(7, user.getFullname());
-            int upd = ps.executeUpdate();
+        try (PreparedStatement userPs = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
+                """
+                        UPDATE \"user\"
+                        SET
+                        currency = ?,
+                        firstname = ?,
+                        surname = ?,
+                        photo = ?,
+                        photo_small = ?
+                        WHERE id = ?
+                        """
+        ); PreparedStatement friendsPs = holder(CFG.userdataJdbcUrl()).connection().prepareStatement(
+                """
+                        INSERT INTO friendship (requester_id, addressee_id, status)
+                        VALUES (?, ?, ?)
+                        """)
+        ) {
+            userPs.setString(1, user.getCurrency().name());
+            userPs.setString(2, user.getFirstname());
+            userPs.setString(3, user.getSurname());
+            userPs.setBytes(4, user.getPhoto());
+            userPs.setBytes(5, user.getPhotoSmall());
+            userPs.setObject(6, user.getId());
+            userPs.executeUpdate();
 
-            if (upd == 0) {
-                throw new RuntimeException("Could not update user");
+            for (FriendshipEntity fe : user.getFriendshipRequests()) {
+                friendsPs.setObject(1, user.getId());
+                friendsPs.setObject(2, fe.getAddressee().getId());
+                friendsPs.setString(3, fe.getStatus().name());
+                friendsPs.addBatch();
+                friendsPs.clearParameters();
             }
-            return user;
+            friendsPs.executeBatch();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return user;
     }
 
     @Override
